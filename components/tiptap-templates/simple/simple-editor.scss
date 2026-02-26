@@ -1,0 +1,171 @@
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap");
+
+body {
+  --tt-toolbar-height: 44px;
+  --tt-theme-text: hsl(var(--foreground));
+  --tt-toolbar-bg-color: hsl(var(--background));
+  --tt-toolbar-border-color: hsl(var(--border));
+  --tt-bg-color: hsl(var(--background));
+
+  .dark & {
+    --tt-theme-text: hsl(var(--foreground));
+    --tt-toolbar-bg-color: hsl(var(--background));
+    --tt-toolbar-border-color: hsl(var(--border));
+    --tt-bg-color: hsl(var(--background));
+  }
+}
+
+body {
+  font-family: "Inter", sans-serif;
+  color: var(--tt-theme-text);
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+  padding: 0;
+  overscroll-behavior-y: none;
+}
+
+html,
+body {
+  overscroll-behavior-x: none;
+}
+
+html,
+body,
+#root,
+#app {
+  height: 100%;
+  background-color: var(--tt-bg-color);
+}
+
+::-webkit-scrollbar {
+  width: 0.25rem;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--tt-scrollbar-color) transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--tt-scrollbar-color);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.tiptap.ProseMirror {
+  font-family: "DM Sans", sans-serif;
+  color: hsl(var(--foreground));
+}
+
+.simple-editor-wrapper {
+  width: 100%;
+  min-height: 12rem;
+  max-width: 100%;
+  overflow: hidden;
+  border: 1px solid var(--tt-toolbar-border-color);
+  border-radius: 0.75rem;
+  background: var(--tt-bg-color);
+}
+
+.simple-editor-wrapper .tiptap-toolbar {
+  background: hsl(var(--background));
+  border-color: hsl(var(--border));
+  color: hsl(var(--foreground));
+}
+
+.simple-editor-wrapper .tiptap-button {
+  --tt-button-default-bg-color: transparent;
+  --tt-button-hover-bg-color: hsl(var(--accent));
+  --tt-button-active-bg-color: hsl(var(--accent));
+  --tt-button-active-bg-color-subdued: hsl(var(--accent));
+  --tt-button-active-bg-color-emphasized: hsl(var(--primary) / 0.14);
+  --tt-button-active-hover-bg-color: hsl(var(--accent));
+  --tt-button-active-hover-bg-color-subdued: hsl(var(--accent));
+  --tt-button-active-hover-bg-color-emphasized: hsl(var(--primary) / 0.2);
+  --tt-button-disabled-bg-color: transparent;
+
+  --tt-button-default-text-color: hsl(var(--muted-foreground));
+  --tt-button-hover-text-color: hsl(var(--foreground));
+  --tt-button-active-text-color: hsl(var(--foreground));
+  --tt-button-active-text-color-subdued: hsl(var(--foreground));
+  --tt-button-active-text-color-emphasized: hsl(var(--primary));
+  --tt-button-disabled-text-color: hsl(var(--muted-foreground) / 0.5);
+
+  --tt-button-default-icon-color: hsl(var(--muted-foreground));
+  --tt-button-hover-icon-color: hsl(var(--foreground));
+  --tt-button-active-icon-color: hsl(var(--primary));
+  --tt-button-active-icon-color-subdued: hsl(var(--foreground));
+  --tt-button-active-icon-color-emphasized: hsl(var(--primary));
+  --tt-button-disabled-icon-color: hsl(var(--muted-foreground) / 0.5);
+
+  --tt-button-default-icon-sub-color: hsl(var(--muted-foreground) / 0.8);
+  --tt-button-hover-icon-sub-color: hsl(var(--muted-foreground));
+  --tt-button-active-icon-sub-color: hsl(var(--muted-foreground));
+  --tt-button-active-icon-sub-color-subdued: hsl(var(--muted-foreground));
+  --tt-button-active-icon-sub-color-emphasized: hsl(var(--primary));
+  --tt-button-disabled-icon-sub-color: hsl(var(--muted-foreground) / 0.4);
+
+  --tt-button-default-dropdown-arrows-color: hsl(var(--muted-foreground));
+  --tt-button-hover-dropdown-arrows-color: hsl(var(--foreground));
+  --tt-button-active-dropdown-arrows-color: hsl(var(--foreground));
+  --tt-button-active-dropdown-arrows-color-subdued: hsl(var(--foreground));
+  --tt-button-active-dropdown-arrows-color-emphasized: hsl(var(--primary));
+  --tt-button-disabled-dropdown-arrows-color: hsl(var(--muted-foreground) / 0.5);
+}
+
+.simple-editor-wrapper .tiptap-button[data-style="primary"] {
+  --tt-button-default-bg-color: hsl(var(--primary));
+  --tt-button-hover-bg-color: hsl(var(--primary) / 0.9);
+  --tt-button-active-bg-color: hsl(var(--primary) / 0.14);
+  --tt-button-active-bg-color-emphasized: hsl(var(--primary) / 0.14);
+  --tt-button-active-bg-color-subdued: hsl(var(--primary) / 0.14);
+  --tt-button-active-hover-bg-color: hsl(var(--primary) / 0.2);
+  --tt-button-active-hover-bg-color-emphasized: hsl(var(--primary) / 0.2);
+  --tt-button-active-hover-bg-color-subdued: hsl(var(--primary) / 0.2);
+
+  --tt-button-default-text-color: hsl(var(--primary-foreground));
+  --tt-button-hover-text-color: hsl(var(--primary-foreground));
+  --tt-button-default-icon-color: hsl(var(--primary-foreground));
+  --tt-button-hover-icon-color: hsl(var(--primary-foreground));
+  --tt-button-default-dropdown-arrows-color: hsl(var(--primary-foreground));
+  --tt-button-hover-dropdown-arrows-color: hsl(var(--primary-foreground));
+  --tt-button-active-text-color: hsl(var(--primary));
+  --tt-button-active-text-color-emphasized: hsl(var(--primary));
+  --tt-button-active-text-color-subdued: hsl(var(--primary));
+  --tt-button-active-icon-color: hsl(var(--primary));
+  --tt-button-active-icon-color-emphasized: hsl(var(--primary));
+  --tt-button-active-icon-color-subdued: hsl(var(--primary));
+}
+
+.simple-editor-content {
+  max-width: 100%;
+  width: 100%;
+  margin: 0;
+  min-height: 0;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.simple-editor-content .tiptap.ProseMirror.simple-editor {
+  flex: 1;
+  min-height: 6rem;
+  padding: 1rem 1rem 4rem;
+  color: hsl(var(--foreground));
+}
+
+@media screen and (max-width: 480px) {
+  .simple-editor-wrapper {
+    border-radius: 0.5rem;
+  }
+
+  .simple-editor-content .tiptap.ProseMirror.simple-editor {
+    min-height: 5rem;
+    padding: 0.875rem 0.875rem 4rem;
+  }
+}
