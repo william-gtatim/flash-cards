@@ -14,6 +14,10 @@ type AtualizarColecaoInput = {
   newCardsDailyLimit: number;
 };
 
+type ExcluirColecaoInput = {
+  id: string;
+};
+
 export function useSalvarColecaoMutation() {
   const queryClient = useQueryClient();
 
@@ -91,6 +95,43 @@ export function useAtualizarColecaoMutation() {
         queryClient.invalidateQueries({
           queryKey: ["categories", "detail", variables.id],
         }),
+        queryClient.invalidateQueries({
+          queryKey: ["flashcards", "study-today", variables.id],
+        }),
+      ]);
+    },
+  });
+}
+
+export function useExcluirColecaoMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationKey: ["categories", "delete"],
+    mutationFn: async ({ id }: ExcluirColecaoInput) => {
+      if (!id) {
+        throw new Error("Coleção inválida.");
+      }
+
+      const supabase = createClient();
+      const { error } = await supabase
+        .from("categories")
+        .delete()
+        .eq("id", id);
+
+      if (error) {
+        throw new Error(error.message || "Erro ao excluir coleção.");
+      }
+
+      return { id };
+    },
+    onSuccess: async (_data, variables) => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["categories", "list"] }),
+        queryClient.invalidateQueries({
+          queryKey: ["categories", "detail", variables.id],
+        }),
+        queryClient.invalidateQueries({ queryKey: ["flashcards", "list"] }),
         queryClient.invalidateQueries({
           queryKey: ["flashcards", "study-today", variables.id],
         }),
