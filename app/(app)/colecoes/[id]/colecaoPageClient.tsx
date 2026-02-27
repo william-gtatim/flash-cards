@@ -37,7 +37,8 @@ export function ColecaoPageClient({ id }: ColecaoPageClientProps) {
             <>
               <FlashcardDeckSummary
                 total={flashcards?.length ?? 0}
-                collectionId={id}
+                cardIds={(flashcards ?? []).map((card) => card.id)}
+                collectionTitle={colecao.name}
                 isLoading={isFlashcardsLoading}
               />
               <FlashcardList

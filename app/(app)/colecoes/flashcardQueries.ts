@@ -44,3 +44,32 @@ export function useFlashcardsDaColecaoQuery(categoryId: string) {
     enabled: Boolean(categoryId),
   });
 }
+
+async function buscarFlashcardsPorIds(ids: string[]) {
+  const supabase = createClient();
+
+  const { data, error } = await supabase
+    .from("flashcards")
+    .select("id, category_id, front, back, is_archived, created_at, updated_at")
+    .in("id", ids)
+    .eq("is_archived", false);
+
+  if (error) {
+    throw new Error(error.message || "Erro ao buscar cards para estudo.");
+  }
+
+  const byId = new Map((data ?? []).map((item) => [item.id, item]));
+  const ordered = ids
+    .map((id) => byId.get(id))
+    .filter((item): item is FlashcardListItem => Boolean(item));
+
+  return ordered;
+}
+
+export function useFlashcardsByIdsQuery(ids: string[]) {
+  return useQuery({
+    queryKey: ["flashcards", "by-ids", ids],
+    queryFn: () => buscarFlashcardsPorIds(ids),
+    enabled: ids.length > 0,
+  });
+}

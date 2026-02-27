@@ -70,7 +70,7 @@ export function ColecaoLayoutClient({
           <BreadcrumbItem>
             {isAdicionarPage ? (
               <BreadcrumbLink asChild>
-                <Link href={`/app/(app)/colecoes/${id}`}>{colecao.name}</Link>
+                <Link href={`/colecoes/${id}`}>{colecao.name}</Link>
               </BreadcrumbLink>
             ) : (
               <BreadcrumbPage>{colecao.name}</BreadcrumbPage>
