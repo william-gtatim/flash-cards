@@ -1,0 +1,23 @@
+.container {
+  width: 100%;
+}
+
+.container :global(.simple-editor-wrapper) {
+  height: var(--editor-height);
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.container :global(.simple-editor-content) {
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.container :global(.simple-editor-content .tiptap.ProseMirror.simple-editor) {
+  min-height: 0;
+  padding-bottom: 1rem;
+}
+
