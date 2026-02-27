@@ -16,6 +16,11 @@ type SalvarFlashcardInput = {
   back: Record<string, unknown>;
 };
 
+type ImportarFlashcardsCsvInput = {
+  categoryId: string;
+  rows: Array<{ front: string; back: string }>;
+};
+
 type ExcluirFlashcardInput = {
   id: string;
   categoryId?: string | null;
@@ -36,6 +41,24 @@ function toRichContentPayload(doc: Record<string, unknown>): RichContentPayload 
     version: 1,
     doc,
   };
+}
+
+function toParagraphDoc(text: string) {
+  const content = text.trim();
+
+  if (!content) {
+    return { type: "doc", content: [{ type: "paragraph" }] } as Record<string, unknown>;
+  }
+
+  return {
+    type: "doc",
+    content: [
+      {
+        type: "paragraph",
+        content: [{ type: "text", text: content }],
+      },
+    ],
+  } as Record<string, unknown>;
 }
 
 export function useSalvarFlashcardMutation() {
@@ -80,6 +103,77 @@ export function useSalvarFlashcardMutation() {
           queryKey: ["flashcards", "list", variables.categoryId],
         }),
         queryClient.invalidateQueries({
+          queryKey: ["flashcards", "due-now", variables.categoryId],
+        }),
+        queryClient.invalidateQueries({
+          queryKey: ["flashcards", "study-today", variables.categoryId],
+        }),
+        queryClient.invalidateQueries({
+          queryKey: ["categories", "detail", variables.categoryId],
+        }),
+      ]);
+    },
+  });
+}
+
+export function useImportarFlashcardsCsvMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationKey: ["flashcards", "import-csv"],
+    mutationFn: async ({ categoryId, rows }: ImportarFlashcardsCsvInput) => {
+      if (!categoryId) {
+        throw new Error("Colecao invalida.");
+      }
+
+      if (!rows.length) {
+        throw new Error("CSV vazio.");
+      }
+
+      const normalizedRows = rows
+        .map((row) => ({
+          front: row.front.trim(),
+          back: row.back.trim(),
+        }))
+        .filter((row) => row.front || row.back);
+
+      if (!normalizedRows.length) {
+        throw new Error("Nenhuma linha valida para importar.");
+      }
+
+      const payload = normalizedRows.map((row) => ({
+        category_id: categoryId,
+        front: toRichContentPayload(toParagraphDoc(row.front)),
+        back: toRichContentPayload(toParagraphDoc(row.back)),
+      }));
+
+      const supabase = createClient();
+      const { data, error } = await supabase
+        .from("flashcards")
+        .insert(payload)
+        .select("id");
+
+      if (error) {
+        throw new Error(error.message || "Erro ao importar CSV.");
+      }
+
+      return {
+        insertedCount: data?.length ?? payload.length,
+      };
+    },
+    onSuccess: async (_data, variables) => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["flashcards", "list"] }),
+        queryClient.invalidateQueries({
+          queryKey: ["flashcards", "list", variables.categoryId],
+        }),
+        queryClient.invalidateQueries({
+          queryKey: ["flashcards", "due-now", variables.categoryId],
+        }),
+        queryClient.invalidateQueries({
+          queryKey: ["flashcards", "study-today", variables.categoryId],
+        }),
+        queryClient.invalidateQueries({
           queryKey: ["categories", "detail", variables.categoryId],
         }),
       ]);
@@ -112,6 +206,16 @@ export function useExcluirFlashcardMutation() {
         variables.categoryId
           ? queryClient.invalidateQueries({
               queryKey: ["flashcards", "list", variables.categoryId],
+            })
+          : Promise.resolve(),
+        variables.categoryId
+          ? queryClient.invalidateQueries({
+              queryKey: ["flashcards", "due-now", variables.categoryId],
+            })
+          : Promise.resolve(),
+        variables.categoryId
+          ? queryClient.invalidateQueries({
+              queryKey: ["flashcards", "study-today", variables.categoryId],
             })
           : Promise.resolve(),
         variables.categoryId

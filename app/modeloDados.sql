@@ -4,6 +4,7 @@ create table if not exists public.categories (
                                                  id uuid primary key default gen_random_uuid(),
     user_id uuid not null references auth.users (id) on delete cascade,
     name text not null,
+    new_cards_daily_limit integer not null default 20 check (new_cards_daily_limit >= 0),
     created_at timestamptz not null default now(),
     updated_at timestamptz not null default now(),
     unique (user_id, name)
@@ -50,6 +51,10 @@ create table if not exists public.flashcard_card_progress (
     user_id uuid not null references auth.users (id) on delete cascade,
     card_id uuid not null references public.flashcards (id) on delete cascade,
     level smallint not null default 1 check (level between 1 and 4),
+    ease_factor numeric(4,2) not null default 2.50 check (ease_factor >= 1.30),
+    repetition integer not null default 0 check (repetition >= 0),
+    interval_days integer not null default 0 check (interval_days >= 0),
+    lapses integer not null default 0 check (lapses >= 0),
     last_grade smallint null check (last_grade is null or last_grade between 1 and 4),
     last_reviewed_at timestamptz null,
     next_due_at timestamptz null,
@@ -218,6 +223,57 @@ using (user_id = auth.uid());
 
 alter table public.categories
     add column if not exists parent_id uuid null;
+
+alter table public.categories
+    add column if not exists new_cards_daily_limit integer not null default 20;
+
+alter table public.categories
+    drop constraint if exists categories_new_cards_daily_limit_check;
+
+alter table public.categories
+    add constraint categories_new_cards_daily_limit_check
+        check (new_cards_daily_limit >= 0);
+
+alter table public.flashcard_card_progress
+    add column if not exists ease_factor numeric(4,2) not null default 2.50;
+
+alter table public.flashcard_card_progress
+    add column if not exists repetition integer not null default 0;
+
+alter table public.flashcard_card_progress
+    add column if not exists interval_days integer not null default 0;
+
+alter table public.flashcard_card_progress
+    add column if not exists lapses integer not null default 0;
+
+alter table public.flashcard_card_progress
+    drop constraint if exists flashcard_card_progress_ease_factor_check;
+
+alter table public.flashcard_card_progress
+    add constraint flashcard_card_progress_ease_factor_check
+        check (ease_factor >= 1.30);
+
+alter table public.flashcard_card_progress
+    drop constraint if exists flashcard_card_progress_repetition_check;
+
+alter table public.flashcard_card_progress
+    add constraint flashcard_card_progress_repetition_check
+        check (repetition >= 0);
+
+alter table public.flashcard_card_progress
+    drop constraint if exists flashcard_card_progress_interval_days_check;
+
+alter table public.flashcard_card_progress
+    add constraint flashcard_card_progress_interval_days_check
+        check (interval_days >= 0);
+
+alter table public.flashcard_card_progress
+    drop constraint if exists flashcard_card_progress_lapses_check;
+
+alter table public.flashcard_card_progress
+    add constraint flashcard_card_progress_lapses_check
+        check (lapses >= 0);
+
 
 alter table public.categories
     add constraint categories_parent_fk

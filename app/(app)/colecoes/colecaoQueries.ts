@@ -7,6 +7,7 @@ import {createClient} from "@/lib/supabase/client";
 export type ColecaoListItem = {
   id: string;
   name: string;
+  new_cards_daily_limit: number;
   created_at: string;
   updated_at: string;
 };
@@ -14,6 +15,7 @@ export type ColecaoListItem = {
 export type ColecaoDetalhe = {
   id: string;
   name: string;
+  new_cards_daily_limit: number;
   created_at: string;
   updated_at: string;
 };
@@ -23,7 +25,7 @@ async function listarColecoes() {
 
   const { data, error } = await supabase
     .from("categories")
-    .select("id, name, created_at, updated_at")
+    .select("id, name, new_cards_daily_limit, created_at, updated_at")
     .order("created_at", { ascending: false });
 
   if (error) {
@@ -45,7 +47,7 @@ async function buscarColecaoPorId(id: string) {
 
   const { data, error } = await supabase
     .from("categories")
-    .select("id, name, created_at, updated_at")
+    .select("id, name, new_cards_daily_limit, created_at, updated_at")
     .eq("id", id)
     .maybeSingle();
 

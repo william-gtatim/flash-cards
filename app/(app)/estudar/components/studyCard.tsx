@@ -14,7 +14,9 @@ type StudyCardProps = {
   back: Record<string, unknown>;
   showBack: boolean;
   onToggleBack: () => void;
-  onNext: () => void;
+  onAnswer: (grade: 1 | 2 | 3 | 4) => void;
+  answerIntervals: Record<1 | 2 | 3 | 4, string>;
+  controlsDisabled?: boolean;
 };
 
 function extractTextFromNode(node: unknown): string {
@@ -52,7 +54,9 @@ export function StudyCard({
   back,
   showBack,
   onToggleBack,
-  onNext,
+  onAnswer,
+  answerIntervals,
+  controlsDisabled = false,
 }: StudyCardProps) {
   const frontText = toPlainText(front) || "Sem conteudo na frente.";
   const backText = toPlainText(back) || "Sem conteudo no verso.";
@@ -91,7 +95,11 @@ export function StudyCard({
               Mostrar resposta
             </Button>
           ) : (
-            <StudyCardControls onNext={onNext} />
+            <StudyCardControls
+              onAnswer={onAnswer}
+              intervals={answerIntervals}
+              disabled={controlsDisabled}
+            />
           )}
         </div>
       </div>

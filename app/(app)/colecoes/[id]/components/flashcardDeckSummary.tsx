@@ -9,6 +9,9 @@ type FlashcardDeckSummaryProps = {
   total: number;
   cardIds: string[];
   collectionTitle: string;
+  dueCount: number;
+  newCountSelected: number;
+  newDailyLimit: number;
   isLoading?: boolean;
 };
 
@@ -16,6 +19,9 @@ export function FlashcardDeckSummary({
   total,
   cardIds,
   collectionTitle,
+  dueCount,
+  newCountSelected,
+  newDailyLimit,
   isLoading = false,
 }: FlashcardDeckSummaryProps) {
   const router = useRouter();
@@ -29,12 +35,16 @@ export function FlashcardDeckSummary({
           <p className="text-6xl font-bold leading-none tracking-tight text-foreground sm:text-7xl">
             {isLoading ? "..." : total}
           </p>
-          <p className="text-base text-muted-foreground">cartoes na colecao</p>
+          <p className="text-base text-muted-foreground">
+            {isLoading
+              ? "Carregando..."
+              : `${dueCount} revisoes + ${newCountSelected} novos (limite ${newDailyLimit})`}
+          </p>
         </div>
 
         <Button
           size="lg"
-          className="h-16 w-full rounded-2xl text-2xl font-bold"
+          className="h-16 w-full rounded-2xl text-xl font-bold"
           onClick={() =>
             router.push(
               `/estudar?ids=${encodeURIComponent(idsQuery)}&title=${titleQuery}`,

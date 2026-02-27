@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 
 import {ThemeSwitcher} from "@/components/theme-switcher";
 import UserMenu from "@/app/(app)/components/header/userMenu";
@@ -9,7 +10,16 @@ export default function Header(){
             <nav className="w-full flex justify-center ">
                 <div className="w-full max-w-5xl flex justify-between items-center p-3 px-5 text-sm">
                     <div className="flex gap-5 items-center font-semibold">
-                        <Link href={"/"}>FlashCards</Link>
+                        <Link href={"/"} aria-label="Inicio">
+                            <Image
+                                src="/imagens/logo.svg"
+                                alt="FlashCards"
+                                width={90}
+                                height={40}
+                                className="h-10 w-auto"
+                                priority
+                            />
+                        </Link>
                     </div>
                    <div className="flex gap-3 items-center">
                        <ThemeSwitcher />

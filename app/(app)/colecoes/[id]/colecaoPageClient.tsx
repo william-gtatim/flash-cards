@@ -2,10 +2,14 @@
 
 import Link from "next/link";
 
+import { ColecaoOptionsDropdown } from "@/app/(app)/colecoes/[id]/components/colecaoOptionsDropdown";
 import { FlashcardDeckSummary } from "@/app/(app)/colecoes/[id]/components/flashcardDeckSummary";
 import { FlashcardList } from "@/app/(app)/colecoes/[id]/components/flashcardList";
 import { useColecaoQuery } from "@/app/(app)/colecoes/colecaoQueries";
-import { useFlashcardsDaColecaoQuery } from "@/app/(app)/colecoes/flashcardQueries";
+import {
+  useFlashcardsDaColecaoQuery,
+  useFlashcardsParaEstudoHojeQuery,
+} from "@/app/(app)/colecoes/flashcardQueries";
 import { Button } from "@/components/ui/button";
 
 type ColecaoPageClientProps = {
@@ -19,6 +23,10 @@ export function ColecaoPageClient({ id }: ColecaoPageClientProps) {
     isLoading: isFlashcardsLoading,
     isError: isFlashcardsError,
   } = useFlashcardsDaColecaoQuery(id);
+  const {
+    data: flashcardsParaEstudoHoje,
+    isLoading: isStudyTodayLoading,
+  } = useFlashcardsParaEstudoHojeQuery(id);
 
   if (isLoading) {
     return null;
@@ -32,14 +40,24 @@ export function ColecaoPageClient({ id }: ColecaoPageClientProps) {
 
       {!isError && colecao ? (
         <div className="space-y-4 pb-24">
-          <h1 className="text-2xl font-semibold tracking-tight">{colecao.name}</h1>
+          <div className="flex items-center justify-between gap-2">
+            <h1 className="text-2xl font-semibold tracking-tight">{colecao.name}</h1>
+            <ColecaoOptionsDropdown
+              categoryId={id}
+              categoryName={colecao.name}
+              newCardsDailyLimit={colecao.new_cards_daily_limit ?? 0}
+            />
+          </div>
           {!isFlashcardsError ? (
             <>
               <FlashcardDeckSummary
-                total={flashcards?.length ?? 0}
-                cardIds={(flashcards ?? []).map((card) => card.id)}
+                total={flashcardsParaEstudoHoje?.cards.length ?? 0}
+                cardIds={(flashcardsParaEstudoHoje?.cards ?? []).map((card) => card.id)}
                 collectionTitle={colecao.name}
-                isLoading={isFlashcardsLoading}
+                dueCount={flashcardsParaEstudoHoje?.dueCount ?? 0}
+                newCountSelected={flashcardsParaEstudoHoje?.newCountSelected ?? 0}
+                newDailyLimit={flashcardsParaEstudoHoje?.newDailyLimit ?? 0}
+                isLoading={isStudyTodayLoading}
               />
               <FlashcardList
                 flashcards={flashcards}
