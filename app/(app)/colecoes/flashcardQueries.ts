@@ -15,9 +15,17 @@ export type FlashcardListItem = {
   category_id: string | null;
   front: FlashcardRichContent | Record<string, unknown>;
   back: FlashcardRichContent | Record<string, unknown>;
+  tags: Array<{ id: string; name: string }>;
   created_at: string;
   updated_at: string;
   is_archived: boolean;
+};
+
+type FlashcardRawRow = Omit<FlashcardListItem, "tags"> & {
+  flashcardcard_tags?: Array<{
+    tag_id: string;
+    tags: { id: string; name: string } | { id: string; name: string }[] | null;
+  }>;
 };
 
 type FlashcardProgressRow = {
@@ -31,7 +39,7 @@ async function listarFlashcardsDaColecao(categoryId: string) {
 
   const { data, error } = await supabase
     .from("flashcards")
-    .select("id, category_id, front, back, is_archived, created_at, updated_at")
+    .select("id, category_id, front, back, is_archived, created_at, updated_at, flashcardcard_tags(tag_id, tags(id, name))")
     .eq("category_id", categoryId)
     .eq("is_archived", false)
     .order("created_at", { ascending: false });
@@ -40,7 +48,7 @@ async function listarFlashcardsDaColecao(categoryId: string) {
     throw new Error(error.message || "Erro ao buscar cartões.");
   }
 
-  return (data ?? []) as FlashcardListItem[];
+  return (data ?? []).map(normalizeFlashcardRow) as FlashcardListItem[];
 }
 
 export function useFlashcardsDaColecaoQuery(categoryId: string) {
@@ -56,7 +64,7 @@ async function buscarFlashcardsPorIds(ids: string[]) {
 
   const { data, error } = await supabase
     .from("flashcards")
-    .select("id, category_id, front, back, is_archived, created_at, updated_at")
+    .select("id, category_id, front, back, is_archived, created_at, updated_at, flashcardcard_tags(tag_id, tags(id, name))")
     .in("id", ids)
     .eq("is_archived", false);
 
@@ -64,12 +72,37 @@ async function buscarFlashcardsPorIds(ids: string[]) {
     throw new Error(error.message || "Erro ao buscar cartões para estudo.");
   }
 
-  const byId = new Map((data ?? []).map((item) => [item.id, item]));
+  const normalized = (data ?? []).map(normalizeFlashcardRow);
+  const byId = new Map(normalized.map((item) => [item.id, item]));
   const ordered = ids
     .map((id) => byId.get(id))
     .filter((item): item is FlashcardListItem => Boolean(item));
 
   return ordered;
+}
+
+function normalizeFlashcardRow(row: FlashcardRawRow): FlashcardListItem {
+  const tags = (row.flashcardcard_tags ?? [])
+    .map((relation) => {
+      if (!relation.tags) return null;
+      if (Array.isArray(relation.tags)) {
+        return relation.tags[0] ?? null;
+      }
+      return relation.tags;
+    })
+    .filter((tag): tag is { id: string; name: string } => Boolean(tag));
+  const uniqueTags = Array.from(new Map(tags.map((tag) => [tag.id, tag])).values());
+
+  return {
+    id: row.id,
+    category_id: row.category_id,
+    front: row.front,
+    back: row.back,
+    tags: uniqueTags,
+    created_at: row.created_at,
+    updated_at: row.updated_at,
+    is_archived: row.is_archived,
+  };
 }
 
 export function useFlashcardsByIdsQuery(ids: string[]) {

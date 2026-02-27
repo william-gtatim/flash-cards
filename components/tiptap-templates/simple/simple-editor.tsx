@@ -203,6 +203,47 @@ export function SimpleEditor({ content = "", onChange }: SimpleEditorProps) {
         "aria-label": "Main content area, start typing to enter text.",
         class: "simple-editor",
       },
+      handlePaste: (view, event) => {
+        const files = Array.from(event.clipboardData?.files ?? []).filter(
+          (file) => file.type.startsWith("image/")
+        )
+
+        if (!files.length) {
+          return false
+        }
+
+        event.preventDefault()
+
+        void (async () => {
+          for (const file of files) {
+            try {
+              const url = await handleImageUpload(file)
+              const imageName = file.name.replace(/\.[^/.]+$/, "") || "image"
+              const imageType = view.state.schema.nodes.image
+
+              if (!imageType) {
+                continue
+              }
+
+              const node = imageType.create({
+                src: url,
+                alt: imageName,
+                title: imageName,
+              })
+
+              const transaction = view.state.tr
+                .replaceSelectionWith(node)
+                .scrollIntoView()
+              view.dispatch(transaction)
+              view.focus()
+            } catch (error) {
+              console.error("Image paste upload failed:", error)
+            }
+          }
+        })()
+
+        return true
+      },
     },
     extensions: [
       StarterKit.configure({

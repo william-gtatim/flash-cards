@@ -14,6 +14,7 @@ type SalvarFlashcardInput = {
   categoryId: string;
   front: Record<string, unknown>;
   back: Record<string, unknown>;
+  tagIds?: string[];
 };
 
 type AtualizarFlashcardInput = {
@@ -21,6 +22,7 @@ type AtualizarFlashcardInput = {
   categoryId?: string | null;
   front: Record<string, unknown>;
   back: Record<string, unknown>;
+  tagIds?: string[];
 };
 
 type ImportarFlashcardsCsvInput = {
@@ -68,12 +70,51 @@ function toParagraphDoc(text: string) {
   } as Record<string, unknown>;
 }
 
+function normalizeTagIds(tagIds?: string[]) {
+  return Array.from(
+    new Set((tagIds ?? []).map((tagId) => tagId.trim()).filter(Boolean)),
+  );
+}
+
+async function syncFlashcardTags(
+  cardId: string,
+  tagIds: string[],
+) {
+  const supabase = createClient();
+
+  const { error: deleteError } = await supabase
+    .from("flashcardcard_tags")
+    .delete()
+    .eq("card_id", cardId);
+
+  if (deleteError) {
+    throw new Error(deleteError.message || "Erro ao atualizar tags do cartão.");
+  }
+
+  if (!tagIds.length) {
+    return;
+  }
+
+  const payload = tagIds.map((tagId) => ({
+    card_id: cardId,
+    tag_id: tagId,
+  }));
+
+  const { error: insertError } = await supabase
+    .from("flashcardcard_tags")
+    .insert(payload);
+
+  if (insertError) {
+    throw new Error(insertError.message || "Erro ao atualizar tags do cartão.");
+  }
+}
+
 export function useSalvarFlashcardMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationKey: ["flashcards", "create"],
-    mutationFn: async ({ categoryId, front, back }: SalvarFlashcardInput) => {
+    mutationFn: async ({ categoryId, front, back, tagIds }: SalvarFlashcardInput) => {
       if (!categoryId) {
         throw new Error("Coleção inválida.");
       }
@@ -99,6 +140,12 @@ export function useSalvarFlashcardMutation() {
 
       if (error) {
         throw new Error(error.message || "Erro ao salvar cartão.");
+      }
+
+      const normalizedTagIds = normalizeTagIds(tagIds);
+
+      if (normalizedTagIds.length) {
+        await syncFlashcardTags(data.id, normalizedTagIds);
       }
 
       return data;
@@ -193,7 +240,7 @@ export function useAtualizarFlashcardMutation() {
 
   return useMutation({
     mutationKey: ["flashcards", "update"],
-    mutationFn: async ({ id, front, back }: AtualizarFlashcardInput) => {
+    mutationFn: async ({ id, front, back, tagIds }: AtualizarFlashcardInput) => {
       if (!id) {
         throw new Error("Cartão inválido.");
       }
@@ -220,6 +267,8 @@ export function useAtualizarFlashcardMutation() {
       if (error) {
         throw new Error(error.message || "Erro ao atualizar cartão.");
       }
+
+      await syncFlashcardTags(id, normalizeTagIds(tagIds));
 
       return data;
     },

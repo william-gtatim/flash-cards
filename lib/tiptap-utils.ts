@@ -12,6 +12,7 @@ import {
   type Editor,
   type NodeWithPos,
 } from "@tiptap/react"
+import { createClient } from "@/lib/supabase/client"
 
 export const MAX_FILE_SIZE = 5 * 1024 * 1024 // 5MB
 
@@ -374,17 +375,63 @@ export const handleImageUpload = async (
     )
   }
 
-  // For demo/testing: Simulate upload progress. In production, replace the following code
-  // with your own upload implementation.
-  for (let progress = 0; progress <= 100; progress += 10) {
-    if (abortSignal?.aborted) {
-      throw new Error("Upload cancelled")
-    }
-    await new Promise((resolve) => setTimeout(resolve, 500))
-    onProgress?.({ progress })
+  if (abortSignal?.aborted) {
+    throw new Error("Upload cancelled")
   }
 
-  return "/images/tiptap-ui-placeholder-image.jpg"
+  const supabase = createClient()
+  const bucket = "imagens"
+  const { data: userData, error: userError } = await supabase.auth.getUser()
+
+  if (userError) {
+    throw new Error(userError.message || "Falha ao identificar usuário")
+  }
+
+  const userId = userData.user?.id
+
+  if (!userId) {
+    throw new Error("Usuário não autenticado")
+  }
+
+  const extension = file.name.split(".").pop()?.toLowerCase() || "png"
+  const safeName = file.name
+    .replace(/\.[^/.]+$/, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9-_]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 40)
+  const randomId =
+    typeof crypto !== "undefined" && "randomUUID" in crypto
+      ? crypto.randomUUID()
+      : `${Date.now()}-${Math.floor(Math.random() * 1_000_000)}`
+  const path = `${userId}/${safeName || "image"}-${randomId}.${extension}`
+
+  onProgress?.({ progress: 10 })
+
+  const { error } = await supabase.storage.from(bucket).upload(path, file, {
+    cacheControl: "31536000",
+    upsert: false,
+    contentType: file.type || "image/png",
+  })
+
+  if (error) {
+    throw new Error(error.message || "Failed to upload image")
+  }
+
+  if (abortSignal?.aborted) {
+    throw new Error("Upload cancelled")
+  }
+
+  const { data } = supabase.storage.from(bucket).getPublicUrl(path)
+  const publicUrl = data?.publicUrl
+
+  if (!publicUrl) {
+    throw new Error("Failed to get uploaded image URL")
+  }
+
+  onProgress?.({ progress: 100 })
+
+  return publicUrl
 }
 
 type ProtocolOptions = {

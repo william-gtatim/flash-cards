@@ -5,6 +5,7 @@ import type { JSONContent } from "@tiptap/core";
 import { toast } from "sonner";
 
 import Editor from "@/app/(app)/colecoes/[id]/adicionar/components/editor";
+import { FlashcardTagsField } from "@/app/(app)/colecoes/[id]/components/flashcardTagsField";
 import { useAtualizarFlashcardMutation } from "@/app/(app)/colecoes/flashcardMutations";
 import type { FlashcardListItem } from "@/app/(app)/colecoes/flashcardQueries";
 import { Button } from "@/components/ui/button";
@@ -58,6 +59,7 @@ export function EditFlashcardDialog({
   const atualizarFlashcard = useAtualizarFlashcardMutation();
   const [front, setFront] = useState<JSONContent>(EMPTY_DOC);
   const [back, setBack] = useState<JSONContent>(EMPTY_DOC);
+  const [tagIds, setTagIds] = useState<string[]>([]);
   const [editorResetKey, setEditorResetKey] = useState(0);
 
   useEffect(() => {
@@ -65,6 +67,7 @@ export function EditFlashcardDialog({
 
     setFront(toEditorDoc(flashcard.front));
     setBack(toEditorDoc(flashcard.back));
+    setTagIds((flashcard.tags ?? []).map((tag) => tag.id));
     setEditorResetKey((prev) => prev + 1);
   }, [open, flashcard]);
 
@@ -76,6 +79,7 @@ export function EditFlashcardDialog({
       categoryId: flashcard.category_id,
       front: front as Record<string, unknown>,
       back: back as Record<string, unknown>,
+      tagIds,
     });
 
     toast.success("Cartão atualizado.");
@@ -89,6 +93,13 @@ export function EditFlashcardDialog({
           <DialogTitle>Editar cartão</DialogTitle>
         </DialogHeader>
 
+        <FlashcardTagsField
+            value={tagIds}
+            onChange={setTagIds}
+            disabled={atualizarFlashcard.isPending}
+        />
+
+
         <div className="space-y-4">
           <div className="min-w-0 space-y-2">
             <h3 className="text-sm font-medium text-foreground">Frente</h3>
@@ -100,6 +111,7 @@ export function EditFlashcardDialog({
             <Editor key={`back-${editorResetKey}`} content={back} onChange={setBack} height={230} />
           </div>
         </div>
+
 
         <DialogFooter className="gap-2 mt-5">
           <Button
@@ -118,4 +130,3 @@ export function EditFlashcardDialog({
     </Dialog>
   );
 }
-
