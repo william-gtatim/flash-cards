@@ -1,5 +1,6 @@
 import QueryProvider from "@/app/queryProvider";
 import { ThemeProvider } from "@/components/theme-provider";
+import { Suspense } from "react";
 import "./globals.css";
 
 export default function ProtectedLayout({
@@ -18,7 +19,7 @@ export default function ProtectedLayout({
       >
         <QueryProvider>
             <main className="min-h-screen flex flex-col items-center bg-muted">
-                {children}
+                <Suspense fallback={null}>{children}</Suspense>
 
             </main>
         </QueryProvider>
