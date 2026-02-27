@@ -30,7 +30,7 @@ export function StudySession({ cardIds, collectionTitle }: StudySessionProps) {
   const total = cards?.length ?? 0;
   const currentCard = total > 0 ? cards?.[index] ?? null : null;
   const { data: currentProgress } = useFlashcardProgressQuery(currentCard?.id);
-  const progressCurrent = isFinished ? total : index + (showBack ? 1 : 0);
+  const progressCurrent = isFinished ? total : index;
   const answerIntervals = useMemo(() => {
     const grade1 = computeSm2Progress(currentProgress ?? null, 1, PREVIEW_BASE_DATE);
     const grade2 = computeSm2Progress(currentProgress ?? null, 2, PREVIEW_BASE_DATE);

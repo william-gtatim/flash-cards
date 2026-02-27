@@ -34,6 +34,11 @@ type FlashcardProgressRow = {
   updated_at: string;
 };
 
+type FlashcardReviewRow = {
+  card_id: string;
+  reviewed_at: string;
+};
+
 async function listarFlashcardsDaColecao(categoryId: string) {
   const supabase = createClient();
 
@@ -197,6 +202,12 @@ async function listarFlashcardsParaEstudoHoje(categoryId: string) {
 
   const newDailyLimit = Math.max(0, categoryRow?.new_cards_daily_limit ?? 20);
 
+  const nowDate = new Date();
+  const startOfToday = new Date(nowDate);
+  startOfToday.setHours(0, 0, 0, 0);
+  const endOfToday = new Date(nowDate);
+  endOfToday.setHours(23, 59, 59, 999);
+
   const { data: progressRows, error: progressError } = await supabase
     .from("flashcard_card_progress")
     .select("card_id, next_due_at, updated_at")
@@ -205,6 +216,35 @@ async function listarFlashcardsParaEstudoHoje(categoryId: string) {
 
   if (progressError) {
     throw new Error(progressError.message || "Erro ao buscar progresso dos cartões.");
+  }
+
+  const { data: reviewRows, error: reviewError } = await supabase
+    .from("flashcard_reviews")
+    .select("card_id, reviewed_at")
+    .in("card_id", cardIds)
+    .lte("reviewed_at", endOfToday.toISOString())
+    .order("reviewed_at", { ascending: true });
+
+  if (reviewError) {
+    throw new Error(reviewError.message || "Erro ao buscar revisões dos cartões.");
+  }
+
+  const firstReviewByCard = new Map<string, string>();
+  for (const row of (reviewRows ?? []) as FlashcardReviewRow[]) {
+    if (!firstReviewByCard.has(row.card_id)) {
+      firstReviewByCard.set(row.card_id, row.reviewed_at);
+    }
+  }
+
+  let newCardsStudiedToday = 0;
+  for (const reviewedAt of firstReviewByCard.values()) {
+    const reviewedAtTime = new Date(reviewedAt).getTime();
+    if (
+      reviewedAtTime >= startOfToday.getTime() &&
+      reviewedAtTime <= endOfToday.getTime()
+    ) {
+      newCardsStudiedToday += 1;
+    }
   }
 
   const latestProgressByCard = new Map<string, FlashcardProgressRow>();
@@ -234,7 +274,8 @@ async function listarFlashcardsParaEstudoHoje(categoryId: string) {
   const sortedNewCards = [...newCards].sort((a, b) =>
     a.created_at.localeCompare(b.created_at),
   );
-  const selectedNewCards = sortedNewCards.slice(0, newDailyLimit);
+  const remainingNewSlots = Math.max(newDailyLimit - newCardsStudiedToday, 0);
+  const selectedNewCards = sortedNewCards.slice(0, remainingNewSlots);
   const selectedCards = [...dueCards, ...selectedNewCards];
 
   return {
