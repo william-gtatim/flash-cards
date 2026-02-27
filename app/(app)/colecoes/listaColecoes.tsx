@@ -1,7 +1,17 @@
 ﻿"use client";
 
 import {ItemColecao} from "@/app/(app)/colecoes/itemColecao";
+import CriarColecao from "@/app/(app)/colecoes/criarColecao";
 import {useListarColecoesQuery} from "@/app/(app)/colecoes/colecaoQueries";
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
+import {FolderOpen} from "lucide-react";
 
 export default function ListaColecoes() {
   const { data, isLoading, isError, error } = useListarColecoesQuery();
@@ -28,11 +38,20 @@ export default function ListaColecoes() {
 
   if (!data?.length) {
     return (
-      <ul className="flex w-full flex-col gap-4 rounded-lg bg-background">
-        <li className="rounded-md border border-dashed border-border p-4 text-sm text-muted-foreground">
-          Nenhuma coleção criada ainda.
-        </li>
-      </ul>
+      <Empty className="w-full bg-background">
+        <EmptyHeader>
+          <EmptyMedia variant="icon">
+            <FolderOpen />
+          </EmptyMedia>
+          <EmptyTitle>Nenhuma coleção criada</EmptyTitle>
+          <EmptyDescription>
+            Crie sua primeira coleção para começar a adicionar cartões e estudar.
+          </EmptyDescription>
+        </EmptyHeader>
+        <EmptyContent className="flex-row justify-center">
+          <CriarColecao />
+        </EmptyContent>
+      </Empty>
     );
   }
 
