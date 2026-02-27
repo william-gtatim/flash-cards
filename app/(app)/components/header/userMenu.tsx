@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import {createClient} from "@/lib/supabase/client";
 import {useRouter} from "next/navigation";
@@ -30,22 +30,23 @@ export default function UserMenu(){
             <DropdownMenuContent>
                 <DropdownMenuItem>
                     <UserIcon />
-                    Profile
+                    Perfil
                 </DropdownMenuItem>
                 <DropdownMenuItem>
                     <CreditCardIcon />
-                    Billing
+                    Cobrança
                 </DropdownMenuItem>
                 <DropdownMenuItem>
                     <SettingsIcon />
-                    Settings
+                    Configurações
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem variant="destructive" onSelect={logout}>
                     <LogOutIcon />
-                    Log out
+                    Sair
                 </DropdownMenuItem>
             </DropdownMenuContent>
         </DropdownMenu>
     )
 }
+

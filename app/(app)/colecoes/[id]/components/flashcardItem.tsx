@@ -1,16 +1,15 @@
 "use client";
 
 import type {FlashcardListItem} from "@/app/(app)/colecoes/flashcardQueries";
-import {EllipsisVertical, Trash2} from "lucide-react";
+import { FlashcardItemOptions } from "@/app/(app)/colecoes/[id]/components/flashcardItemOptions";
 
-import {Button} from "@/components/ui/button";
 import {Card, CardContent} from "@/components/ui/card";
-import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,} from "@/components/ui/dropdown-menu";
 
 type FlashcardItemProps = {
   flashcard: FlashcardListItem;
+  onEdit?: (flashcard: FlashcardListItem) => void;
   onDelete?: (flashcard: FlashcardListItem) => void;
-  deleting?: boolean;
+  actionsDisabled?: boolean;
 };
 
 type RichPayload = {
@@ -52,8 +51,9 @@ function getPreview(value: FlashcardListItem["front"]) {
 
 export function FlashcardItem({
   flashcard,
+  onEdit,
   onDelete,
-  deleting = false,
+  actionsDisabled = false,
 }: FlashcardItemProps) {
   const frontPreview = getPreview(flashcard.front);
   const backPreview = getPreview(flashcard.back);
@@ -66,37 +66,20 @@ export function FlashcardItem({
             <p className="line-clamp-2 text-base font-semibold leading-snug text-foreground sm:text-lg">
               {frontPreview}
             </p>
-            <p className="line-clamp-2 text-sm leading-relaxed text-muted-foreground">
+            <p className="line-clamp-2 text-sm  leading-relaxed text-muted-foreground">
               {backPreview}
             </p>
           </div>
 
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                className="mt-[-4px] h-8 w-8 shrink-0 rounded-full"
-                disabled={deleting}
-                aria-label="Opções do cartão"
-              >
-                <EllipsisVertical className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem
-                variant="destructive"
-                onClick={() => onDelete?.(flashcard)}
-                disabled={deleting}
-              >
-                <Trash2 className="h-4 w-4" />
-                Excluir
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <FlashcardItemOptions
+            flashcard={flashcard}
+            onEdit={onEdit}
+            onDelete={onDelete}
+            disabled={actionsDisabled}
+          />
         </div>
       </CardContent>
     </Card>
   );
 }
+

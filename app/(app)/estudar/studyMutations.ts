@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
@@ -23,11 +23,11 @@ export function useRegistrarRevisaoMutation() {
     mutationKey: ["study", "review"],
     mutationFn: async ({ cardId, grade }: RegistrarRevisaoInput) => {
       if (!cardId) {
-        throw new Error("Card invalido.");
+        throw new Error("Cartão inválido.");
       }
 
       if (![1, 2, 3, 4].includes(grade)) {
-        throw new Error("Nota invalida.");
+        throw new Error("Nota inválida.");
       }
 
       const supabase = createClient();
@@ -41,7 +41,7 @@ export function useRegistrarRevisaoMutation() {
       });
 
       if (reviewError) {
-        throw new Error(reviewError.message || "Erro ao registrar revisao.");
+        throw new Error(reviewError.message || "Erro ao registrar revisão.");
       }
 
       const { data: progressRows, error: progressReadError } = await supabase
@@ -54,7 +54,7 @@ export function useRegistrarRevisaoMutation() {
         .limit(1);
 
       if (progressReadError) {
-        throw new Error(progressReadError.message || "Erro ao carregar progresso do card.");
+        throw new Error(progressReadError.message || "Erro ao carregar progresso do cartão.");
       }
 
       const previous = (progressRows?.[0] ?? null) as ProgressSnapshotRow | null;
@@ -79,7 +79,7 @@ export function useRegistrarRevisaoMutation() {
           .eq("id", previous.id);
 
         if (updateError) {
-          throw new Error(updateError.message || "Erro ao atualizar progresso do card.");
+          throw new Error(updateError.message || "Erro ao atualizar progresso do cartão.");
         }
       } else {
         const { error: insertError } = await supabase.from("flashcard_card_progress").insert({
@@ -98,7 +98,7 @@ export function useRegistrarRevisaoMutation() {
         });
 
         if (insertError) {
-          throw new Error(insertError.message || "Erro ao criar progresso do card.");
+          throw new Error(insertError.message || "Erro ao criar progresso do cartão.");
         }
       }
 
@@ -119,3 +119,5 @@ export function useRegistrarRevisaoMutation() {
     },
   });
 }
+
+

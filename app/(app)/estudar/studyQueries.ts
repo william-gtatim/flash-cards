@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useQuery } from "@tanstack/react-query";
 
@@ -18,7 +18,7 @@ async function buscarProgressoDoCard(cardId: string) {
     .limit(1);
 
   if (error) {
-    throw new Error(error.message || "Erro ao buscar progresso do card.");
+    throw new Error(error.message || "Erro ao buscar progresso do cartão.");
   }
 
   return (data?.[0] ?? null) as ProgressSnapshot | null;
@@ -31,3 +31,4 @@ export function useFlashcardProgressQuery(cardId?: string) {
     enabled: Boolean(cardId),
   });
 }
+

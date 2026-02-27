@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 
@@ -35,7 +35,7 @@ export function ColecaoPageClient({ id }: ColecaoPageClientProps) {
   return (
     <div className="space-y-4">
       {!isError && !colecao ? (
-        <p className="text-sm text-muted-foreground">Colecao nao encontrada.</p>
+        <p className="text-sm text-muted-foreground">Coleção não encontrada.</p>
       ) : null}
 
       {!isError && colecao ? (
@@ -71,10 +71,11 @@ export function ColecaoPageClient({ id }: ColecaoPageClientProps) {
       <div className="fixed inset-x-0 bottom-6 z-40 px-4">
         <div className="mx-auto flex max-w-3xl justify-center">
           <Button asChild variant="dark" size="xl">
-            <Link href={`/colecoes/${id}/adicionar`}>Adicionar cartoes</Link>
+            <Link href={`/colecoes/${id}/adicionar`}>Adicionar cartões</Link>
           </Button>
         </div>
       </div>
     </div>
   );
 }
+

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import {useMutation, useQueryClient} from "@tanstack/react-query";
 
@@ -23,7 +23,7 @@ export function useSalvarColecaoMutation() {
       const trimmedName = name.trim();
 
       if (!trimmedName) {
-        throw new Error("Informe o nome da colecao.");
+        throw new Error("Informe o nome da coleção.");
       }
 
       const supabase = createClient();
@@ -33,10 +33,10 @@ export function useSalvarColecaoMutation() {
 
       if (error) {
         if (error.code === "23505") {
-          throw new Error("Ja existe uma colecao com esse nome.");
+          throw new Error("Já existe uma coleção com esse nome.");
         }
 
-        throw new Error(error.message || "Erro ao salvar colecao.");
+        throw new Error(error.message || "Erro ao salvar coleção.");
       }
 
       return { name: trimmedName };
@@ -59,11 +59,11 @@ export function useAtualizarColecaoMutation() {
         : 0;
 
       if (!id) {
-        throw new Error("Colecao invalida.");
+        throw new Error("Coleção inválida.");
       }
 
       if (!trimmedName) {
-        throw new Error("Informe o nome da colecao.");
+        throw new Error("Informe o nome da coleção.");
       }
 
       const supabase = createClient();
@@ -77,10 +77,10 @@ export function useAtualizarColecaoMutation() {
 
       if (error) {
         if (error.code === "23505") {
-          throw new Error("Ja existe uma colecao com esse nome.");
+          throw new Error("Já existe uma coleção com esse nome.");
         }
 
-        throw new Error(error.message || "Erro ao atualizar colecao.");
+        throw new Error(error.message || "Erro ao atualizar coleção.");
       }
 
       return { id, name: trimmedName, newCardsDailyLimit: normalizedDailyLimit };
@@ -98,3 +98,4 @@ export function useAtualizarColecaoMutation() {
     },
   });
 }
+

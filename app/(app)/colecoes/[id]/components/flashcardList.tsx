@@ -4,6 +4,7 @@ import {useState} from "react";
 import {toast} from "sonner";
 
 import {useExcluirFlashcardMutation} from "@/app/(app)/colecoes/flashcardMutations";
+import { EditFlashcardDialog } from "@/app/(app)/colecoes/[id]/components/editFlashcardDialog";
 import type {FlashcardListItem} from "@/app/(app)/colecoes/flashcardQueries";
 import {FlashcardItem} from "@/app/(app)/colecoes/[id]/components/flashcardItem";
 
@@ -18,6 +19,8 @@ export function FlashcardList({
 }: FlashcardListProps) {
   const excluirFlashcard = useExcluirFlashcardMutation();
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [editingFlashcard, setEditingFlashcard] = useState<FlashcardListItem | null>(null);
+  const [openEditDialog, setOpenEditDialog] = useState(false);
 
   async function handleDelete(flashcard: FlashcardListItem) {
     setDeletingId(flashcard.id);
@@ -31,6 +34,11 @@ export function FlashcardList({
     } finally {
       setDeletingId(null);
     }
+  }
+
+  function handleEdit(flashcard: FlashcardListItem) {
+    setEditingFlashcard(flashcard);
+    setOpenEditDialog(true);
   }
 
   if (isLoading) {
@@ -50,15 +58,25 @@ export function FlashcardList({
   }
 
   return (
-    <div className="space-y-3">
-      {flashcards.map((flashcard) => (
-        <FlashcardItem
-          key={flashcard.id}
-          flashcard={flashcard}
-          onDelete={handleDelete}
-          deleting={deletingId === flashcard.id}
-        />
-      ))}
-    </div>
+    <>
+      <div className="space-y-3">
+        {flashcards.map((flashcard) => (
+          <FlashcardItem
+            key={flashcard.id}
+            flashcard={flashcard}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+            actionsDisabled={deletingId === flashcard.id}
+          />
+        ))}
+      </div>
+
+      <EditFlashcardDialog
+        open={openEditDialog}
+        onOpenChange={setOpenEditDialog}
+        flashcard={editingFlashcard}
+      />
+    </>
   );
 }
+

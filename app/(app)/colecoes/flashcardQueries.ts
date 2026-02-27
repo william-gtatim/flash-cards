@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import {useQuery} from "@tanstack/react-query";
 
@@ -61,7 +61,7 @@ async function buscarFlashcardsPorIds(ids: string[]) {
     .eq("is_archived", false);
 
   if (error) {
-    throw new Error(error.message || "Erro ao buscar cards para estudo.");
+    throw new Error(error.message || "Erro ao buscar cartões para estudo.");
   }
 
   const byId = new Map((data ?? []).map((item) => [item.id, item]));
@@ -97,7 +97,7 @@ async function listarFlashcardsDisponiveisAgora(categoryId: string) {
     .order("updated_at", { ascending: false });
 
   if (progressError) {
-    throw new Error(progressError.message || "Erro ao buscar progresso dos cards.");
+    throw new Error(progressError.message || "Erro ao buscar progresso dos cartões.");
   }
 
   const latestProgressByCard = new Map<string, FlashcardProgressRow>();
@@ -159,7 +159,7 @@ async function listarFlashcardsParaEstudoHoje(categoryId: string) {
     .maybeSingle();
 
   if (categoryError) {
-    throw new Error(categoryError.message || "Erro ao buscar limite de novos da colecao.");
+    throw new Error(categoryError.message || "Erro ao buscar limite de novos da coleção.");
   }
 
   const newDailyLimit = Math.max(0, categoryRow?.new_cards_daily_limit ?? 20);
@@ -171,7 +171,7 @@ async function listarFlashcardsParaEstudoHoje(categoryId: string) {
     .order("updated_at", { ascending: false });
 
   if (progressError) {
-    throw new Error(progressError.message || "Erro ao buscar progresso dos cards.");
+    throw new Error(progressError.message || "Erro ao buscar progresso dos cartões.");
   }
 
   const latestProgressByCard = new Map<string, FlashcardProgressRow>();
@@ -219,3 +219,6 @@ export function useFlashcardsParaEstudoHojeQuery(categoryId: string) {
     enabled: Boolean(categoryId),
   });
 }
+
+
+

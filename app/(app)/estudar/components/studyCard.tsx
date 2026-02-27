@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -58,8 +58,8 @@ export function StudyCard({
   answerIntervals,
   controlsDisabled = false,
 }: StudyCardProps) {
-  const frontText = toPlainText(front) || "Sem conteudo na frente.";
-  const backText = toPlainText(back) || "Sem conteudo no verso.";
+  const frontText = toPlainText(front) || "Sem conteúdo na frente.";
+  const backText = toPlainText(back) || "Sem conteúdo no verso.";
 
   return (
     <div className="space-y-6">
@@ -106,3 +106,4 @@ export function StudyCard({
     </div>
   );
 }
+

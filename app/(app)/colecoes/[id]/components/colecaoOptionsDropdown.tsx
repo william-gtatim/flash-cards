@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { EllipsisVertical, FilePenLine, FileUp } from "lucide-react";
@@ -31,7 +31,7 @@ export function ColecaoOptionsDropdown({
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button type="button" variant="ghost" size="icon" aria-label="Opcoes da colecao">
+          <Button type="button" variant="ghost" size="icon" aria-label="Opções da coleção">
             <EllipsisVertical className="h-5 w-5" />
           </Button>
         </DropdownMenuTrigger>
@@ -63,3 +63,4 @@ export function ColecaoOptionsDropdown({
     </>
   );
 }
+

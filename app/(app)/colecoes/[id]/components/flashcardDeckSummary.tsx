@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useRouter } from "next/navigation";
 
@@ -38,7 +38,7 @@ export function FlashcardDeckSummary({
           <p className="text-base text-muted-foreground">
             {isLoading
               ? "Carregando..."
-              : `${dueCount} revisoes + ${newCountSelected} novos (limite ${newDailyLimit})`}
+              : `${dueCount} revisões + ${newCountSelected} novos (limite ${newDailyLimit})`}
           </p>
         </div>
 
@@ -58,3 +58,4 @@ export function FlashcardDeckSummary({
     </Card>
   );
 }
+

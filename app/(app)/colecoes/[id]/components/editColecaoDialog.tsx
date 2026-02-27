@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -57,7 +57,7 @@ export function EditColecaoDialog({
       newCardsDailyLimit: parsedDailyLimit,
     });
 
-    toast.success("Colecao atualizada.");
+    toast.success("Coleção atualizada.");
     onOpenChange(false);
   }
 
@@ -65,9 +65,9 @@ export function EditColecaoDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Editar colecao</DialogTitle>
+          <DialogTitle>Editar coleção</DialogTitle>
           <DialogDescription>
-            Altere o nome da colecao e o limite diario de novos cards.
+            Altere o nome da coleção e o limite diário de novos cartões.
           </DialogDescription>
         </DialogHeader>
 
@@ -75,13 +75,13 @@ export function EditColecaoDialog({
           <Input
             value={name}
             onChange={(event) => setName(event.target.value)}
-            placeholder="Nome da colecao"
+            placeholder="Nome da coleção"
             inputSize="lg"
           />
           <Input
             value={newCardsDailyLimit}
             onChange={(event) => setNewCardsDailyLimit(event.target.value)}
-            placeholder="Limite diario de novos cards"
+            placeholder="Limite diário de novos cartões"
             inputMode="numeric"
             type="number"
             min={0}
@@ -107,3 +107,5 @@ export function EditColecaoDialog({
     </Dialog>
   );
 }
+
+

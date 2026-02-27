@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useMemo, useState } from "react";
 
@@ -71,7 +71,7 @@ export function StudySession({ cardIds, collectionTitle }: StudySessionProps) {
       <div className="space-y-4">
         <StudyProgress title={collectionTitle} current={0} total={0} />
         <p className="text-sm text-muted-foreground">
-          Nenhum card informado para estudar.
+          Nenhum cartão informado para estudar.
         </p>
       </div>
     );
@@ -95,7 +95,7 @@ export function StudySession({ cardIds, collectionTitle }: StudySessionProps) {
       <div className="space-y-4">
         <StudyProgress title={collectionTitle} current={0} total={0} />
         <p className="text-sm text-muted-foreground">
-          Nenhum card encontrado com os IDs informados.
+          Nenhum cartão encontrado com os IDs informados.
         </p>
       </div>
     );
@@ -105,7 +105,7 @@ export function StudySession({ cardIds, collectionTitle }: StudySessionProps) {
     return (
       <div className="space-y-4">
         <StudyProgress title={collectionTitle} current={progressCurrent} total={total} />
-        <p className="text-sm text-muted-foreground">Sessao concluida.</p>
+        <p className="text-sm text-muted-foreground">Sessão concluída.</p>
       </div>
     );
   }
@@ -125,3 +125,5 @@ export function StudySession({ cardIds, collectionTitle }: StudySessionProps) {
     </div>
   );
 }
+
+

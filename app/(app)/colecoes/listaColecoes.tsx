@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import {ItemColecao} from "@/app/(app)/colecoes/itemColecao";
 import {useListarColecoesQuery} from "@/app/(app)/colecoes/colecaoQueries";
@@ -10,7 +10,7 @@ export default function ListaColecoes() {
     return (
       <ul className="flex w-full flex-col gap-4 rounded-lg bg-background">
         <li className="rounded-md border border-border p-4 text-sm text-muted-foreground">
-          Carregando colecoes...
+          Carregando coleções...
         </li>
       </ul>
     );
@@ -20,7 +20,7 @@ export default function ListaColecoes() {
     return (
       <ul className="flex w-full flex-col gap-4 rounded-lg bg-background">
         <li className="rounded-md border border-destructive/30 p-4 text-sm text-destructive">
-          {error instanceof Error ? error.message : "Erro ao carregar colecoes."}
+          {error instanceof Error ? error.message : "Erro ao carregar coleções."}
         </li>
       </ul>
     );
@@ -30,7 +30,7 @@ export default function ListaColecoes() {
     return (
       <ul className="flex w-full flex-col gap-4 rounded-lg bg-background">
         <li className="rounded-md border border-dashed border-border p-4 text-sm text-muted-foreground">
-          Nenhuma colecao criada ainda.
+          Nenhuma coleção criada ainda.
         </li>
       </ul>
     );
@@ -44,3 +44,4 @@ export default function ListaColecoes() {
     </ul>
   );
 }
+

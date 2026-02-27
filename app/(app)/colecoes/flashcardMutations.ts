@@ -16,6 +16,13 @@ type SalvarFlashcardInput = {
   back: Record<string, unknown>;
 };
 
+type AtualizarFlashcardInput = {
+  id: string;
+  categoryId?: string | null;
+  front: Record<string, unknown>;
+  back: Record<string, unknown>;
+};
+
 type ImportarFlashcardsCsvInput = {
   categoryId: string;
   rows: Array<{ front: string; back: string }>;
@@ -68,15 +75,15 @@ export function useSalvarFlashcardMutation() {
     mutationKey: ["flashcards", "create"],
     mutationFn: async ({ categoryId, front, back }: SalvarFlashcardInput) => {
       if (!categoryId) {
-        throw new Error("Colecao invalida.");
+        throw new Error("Coleção inválida.");
       }
 
       if (isEmptyRichDoc(front)) {
-        throw new Error("Preencha a frente do cartao.");
+        throw new Error("Preencha a frente do cartão.");
       }
 
       if (isEmptyRichDoc(back)) {
-        throw new Error("Preencha o verso do cartao.");
+        throw new Error("Preencha o verso do cartão.");
       }
 
       const supabase = createClient();
@@ -91,7 +98,7 @@ export function useSalvarFlashcardMutation() {
         .single();
 
       if (error) {
-        throw new Error(error.message || "Erro ao salvar cartao.");
+        throw new Error(error.message || "Erro ao salvar cartão.");
       }
 
       return data;
@@ -123,7 +130,7 @@ export function useImportarFlashcardsCsvMutation() {
     mutationKey: ["flashcards", "import-csv"],
     mutationFn: async ({ categoryId, rows }: ImportarFlashcardsCsvInput) => {
       if (!categoryId) {
-        throw new Error("Colecao invalida.");
+        throw new Error("Coleção inválida.");
       }
 
       if (!rows.length) {
@@ -138,7 +145,7 @@ export function useImportarFlashcardsCsvMutation() {
         .filter((row) => row.front || row.back);
 
       if (!normalizedRows.length) {
-        throw new Error("Nenhuma linha valida para importar.");
+        throw new Error("Nenhuma linha válida para importar.");
       }
 
       const payload = normalizedRows.map((row) => ({
@@ -181,6 +188,69 @@ export function useImportarFlashcardsCsvMutation() {
   });
 }
 
+export function useAtualizarFlashcardMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationKey: ["flashcards", "update"],
+    mutationFn: async ({ id, front, back }: AtualizarFlashcardInput) => {
+      if (!id) {
+        throw new Error("Cartão inválido.");
+      }
+
+      if (isEmptyRichDoc(front)) {
+        throw new Error("Preencha a frente do cartão.");
+      }
+
+      if (isEmptyRichDoc(back)) {
+        throw new Error("Preencha o verso do cartão.");
+      }
+
+      const supabase = createClient();
+      const { data, error } = await supabase
+        .from("flashcards")
+        .update({
+          front: toRichContentPayload(front),
+          back: toRichContentPayload(back),
+        })
+        .eq("id", id)
+        .select("id, category_id")
+        .single();
+
+      if (error) {
+        throw new Error(error.message || "Erro ao atualizar cartão.");
+      }
+
+      return data;
+    },
+    onSuccess: async (_data, variables) => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["flashcards", "list"] }),
+        variables.categoryId
+          ? queryClient.invalidateQueries({
+              queryKey: ["flashcards", "list", variables.categoryId],
+            })
+          : Promise.resolve(),
+        variables.categoryId
+          ? queryClient.invalidateQueries({
+              queryKey: ["flashcards", "due-now", variables.categoryId],
+            })
+          : Promise.resolve(),
+        variables.categoryId
+          ? queryClient.invalidateQueries({
+              queryKey: ["flashcards", "study-today", variables.categoryId],
+            })
+          : Promise.resolve(),
+        variables.categoryId
+          ? queryClient.invalidateQueries({
+              queryKey: ["categories", "detail", variables.categoryId],
+            })
+          : Promise.resolve(),
+      ]);
+    },
+  });
+}
+
 export function useExcluirFlashcardMutation() {
   const queryClient = useQueryClient();
 
@@ -188,14 +258,14 @@ export function useExcluirFlashcardMutation() {
     mutationKey: ["flashcards", "delete"],
     mutationFn: async ({ id }: ExcluirFlashcardInput) => {
       if (!id) {
-        throw new Error("Cartao invalido.");
+        throw new Error("Cartão inválido.");
       }
 
       const supabase = createClient();
       const { error } = await supabase.from("flashcards").delete().eq("id", id);
 
       if (error) {
-        throw new Error(error.message || "Erro ao excluir cartao.");
+        throw new Error(error.message || "Erro ao excluir cartão.");
       }
 
       return { id };
@@ -227,3 +297,4 @@ export function useExcluirFlashcardMutation() {
     },
   });
 }
+

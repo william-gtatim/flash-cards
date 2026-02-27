@@ -1,4 +1,5 @@
 import QueryProvider from "@/app/queryProvider";
+import { ThemeProvider } from "@/components/theme-provider";
 import "./globals.css";
 
 export default function ProtectedLayout({
@@ -7,14 +8,21 @@ export default function ProtectedLayout({
   children: React.ReactNode;
 }) {
   return (
-      <html lang="pt-BR">
+      <html lang="pt-BR" suppressHydrationWarning>
       <body>
-      <QueryProvider>
-          <main className="min-h-screen flex flex-col items-center bg-muted">
-              {children}
+      <ThemeProvider
+        attribute="class"
+        defaultTheme="system"
+        enableSystem
+        disableTransitionOnChange
+      >
+        <QueryProvider>
+            <main className="min-h-screen flex flex-col items-center bg-muted">
+                {children}
 
-          </main>
-      </QueryProvider>
+            </main>
+        </QueryProvider>
+      </ThemeProvider>
       </body>
       </html>
 

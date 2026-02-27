@@ -1,16 +1,26 @@
 "use client";
 
+import type { CSSProperties } from "react";
 import {SimpleEditor} from "@/components/tiptap-templates/simple/simple-editor";
 import type {JSONContent} from "@tiptap/core";
+import styles from "./editor.module.css";
 
 type EditorProps = {
   content?: JSONContent | string;
   onChange?: (content: JSONContent) => void;
+  height?: number;
 };
 
-export default function Editor({ content, onChange }: EditorProps) {
+export default function Editor({ content, onChange, height = 230 }: EditorProps) {
+  const style = {
+    "--editor-height": `${height}px`,
+  } as CSSProperties;
+
   return (
-    <div className="w-full [&_.simple-editor-wrapper]:h-[230px] [&_.simple-editor-wrapper]:min-h-0 [&_.simple-editor-wrapper]:overflow-y-auto [&_.simple-editor-wrapper]:overflow-x-hidden [&_.simple-editor-content]:min-h-0">
+    <div
+      style={style}
+      className={styles.container}
+    >
       <SimpleEditor content={content} onChange={onChange} />
     </div>
   );

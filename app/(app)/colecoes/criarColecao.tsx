@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import * as React from "react";
 import {useRouter} from "next/navigation";
@@ -41,7 +41,7 @@ export default function CriarColecao() {
       router.refresh();
     } catch (error: unknown) {
       setErrorMessage(
-        error instanceof Error ? error.message : "Erro ao salvar colecao.",
+        error instanceof Error ? error.message : "Erro ao salvar coleção.",
       );
     }
   };
@@ -55,9 +55,9 @@ export default function CriarColecao() {
 
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Criar colecao</DialogTitle>
+            <DialogTitle>Criar coleção</DialogTitle>
             <DialogDescription>
-              Voce alcanca os melhores resultados com os cartoes que cria por conta propria.
+              Você alcança os melhores resultados com os cartões que cria por conta própria.
             </DialogDescription>
           </DialogHeader>
 
@@ -66,7 +66,7 @@ export default function CriarColecao() {
               inputSize="lg"
               id="nome-colecao"
               name="nome"
-              placeholder="Nome da colecao"
+              placeholder="Nome da coleção"
               value={name}
               onChange={(event) => setName(event.target.value)}
               disabled={salvarColecaoMutation.isPending}
@@ -93,3 +93,4 @@ export default function CriarColecao() {
     </div>
   );
 }
+

@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import Image from "next/image";
 
 import {ThemeSwitcher} from "@/components/theme-switcher";
@@ -10,7 +10,7 @@ export default function Header(){
             <nav className="w-full flex justify-center ">
                 <div className="w-full max-w-5xl flex justify-between items-center p-3 px-5 text-sm">
                     <div className="flex gap-5 items-center font-semibold">
-                        <Link href={"/"} aria-label="Inicio">
+                        <Link href={"/"} aria-label="Início">
                             <Image
                                 src="/imagens/logo.svg"
                                 alt="FlashCards"
@@ -30,3 +30,4 @@ export default function Header(){
         </header>
     )
 }
+

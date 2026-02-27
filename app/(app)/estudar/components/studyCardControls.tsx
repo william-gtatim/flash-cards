@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 type StudyCardControlsProps = {
   onAnswer: (grade: 1 | 2 | 3 | 4) => void;
@@ -35,7 +35,7 @@ export function StudyCardControls({
           disabled={disabled}
         >
           <span className="block whitespace-nowrap text-base font-medium leading-tight">
-            Dificil
+            Difícil
           </span>
           <span className="mt-1 block text-sm font-medium leading-tight">
             {intervals[2]}
@@ -63,7 +63,7 @@ export function StudyCardControls({
           disabled={disabled}
         >
           <span className="block whitespace-nowrap text-base font-medium leading-tight">
-            Facil
+            Fácil
           </span>
           <span className="mt-1 block text-sm font-medium leading-tight">
             {intervals[4]}
@@ -73,3 +73,4 @@ export function StudyCardControls({
     </div>
   );
 }
+

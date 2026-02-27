@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import {useState} from "react";
 import type {JSONContent} from "@tiptap/core";
@@ -32,7 +32,7 @@ export function AdicionarCartaoForm({
       back: back as Record<string, unknown>,
     });
 
-    toast.success("Cartao salvo com sucesso.");
+    toast.success("Cartão salvo com sucesso.");
 
     setFront(EMPTY_DOC);
     setBack(EMPTY_DOC);
@@ -50,13 +50,14 @@ export function AdicionarCartaoForm({
             {salvarFlashcard.isPending ? "Salvando..." : "Salvar"}
           </Button>
         </div>
-        <Editor key={`front-${editorResetKey}`} onChange={setFront} />
+        <Editor key={`front-${editorResetKey}`} onChange={setFront} height={140} />
       </div>
 
       <div className="text-sm text-muted-foreground">
         <h2 className="mb-2 text-lg font-semibold text-foreground">Verso</h2>
-        <Editor key={`back-${editorResetKey}`} onChange={setBack} />
+        <Editor key={`back-${editorResetKey}`} onChange={setBack} height={230} />
       </div>
     </div>
   );
 }
+

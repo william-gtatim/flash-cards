@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import {useQuery} from "@tanstack/react-query";
 
@@ -29,7 +29,7 @@ async function listarColecoes() {
     .order("created_at", { ascending: false });
 
   if (error) {
-    throw new Error(error.message || "Erro ao buscar colecoes.");
+    throw new Error(error.message || "Erro ao buscar coleções.");
   }
 
   return (data ?? []) as ColecaoListItem[];
@@ -52,7 +52,7 @@ async function buscarColecaoPorId(id: string) {
     .maybeSingle();
 
   if (error) {
-    throw new Error(error.message || "Erro ao buscar colecao.");
+    throw new Error(error.message || "Erro ao buscar coleção.");
   }
 
   return (data ?? null) as ColecaoDetalhe | null;
@@ -65,3 +65,4 @@ export function useColecaoQuery(id: string) {
     enabled: Boolean(id),
   });
 }
+

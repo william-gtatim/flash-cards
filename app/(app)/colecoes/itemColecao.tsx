@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import {
   Item,
@@ -23,15 +23,15 @@ export function ItemColecao({ colecao }: ItemColecaoProps) {
 
   const dueCount = flashcardsDisponiveisAgora?.length ?? 0;
   const description = isLoading
-    ? "Cartoes para revisar hoje: ..."
+    ? "Cartões para revisar hoje: ..."
     : dueCount > 0
-      ? `Cartoes para revisar hoje: ${dueCount}`
+      ? `Cartões para revisar hoje: ${dueCount}`
       : "Tudo revisado por hoje.";
 
   return (
     <li className="border-b border-b-foreground/10 last:border-b-0">
       <Item asChild>
-        <Link href={`/colecoes/${colecao.id}`} aria-label={`Abrir colecao ${colecao.name}`}>
+        <Link href={`/colecoes/${colecao.id}`} aria-label={`Abrir coleção ${colecao.name}`}>
           <ItemContent>
             <ItemTitle>{colecao.name}</ItemTitle>
             <ItemDescription>{description}</ItemDescription>
@@ -44,3 +44,4 @@ export function ItemColecao({ colecao }: ItemColecaoProps) {
     </li>
   );
 }
+

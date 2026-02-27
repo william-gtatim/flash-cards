@@ -1,4 +1,4 @@
-import {redirect} from "next/navigation";
+﻿import {redirect} from "next/navigation";
 
 import {createClient} from "@/lib/supabase/server";
 import CriarColecao from "@/app/(app)/colecoes/criarColecao";
@@ -28,3 +28,4 @@ export default function CardsPage() {
     </div>
   );
 }
+

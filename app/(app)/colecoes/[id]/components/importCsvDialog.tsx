@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -128,7 +128,7 @@ export function ImportCsvDialog({
       rows,
     });
 
-    toast.success(`${result.insertedCount} cartoes importados.`);
+    toast.success(`${result.insertedCount} cartões importados.`);
     setFile(null);
     onOpenChange(false);
   }
@@ -139,7 +139,7 @@ export function ImportCsvDialog({
         <DialogHeader>
           <DialogTitle>Importar CSV</DialogTitle>
           <DialogDescription>
-            Arquivo sem cabecalho, com 2 colunas por linha: frente,verso.
+            Arquivo sem cabeçalho, com 2 colunas por linha: frente,verso.
           </DialogDescription>
         </DialogHeader>
 
@@ -171,3 +171,4 @@ export function ImportCsvDialog({
     </Dialog>
   );
 }
+
