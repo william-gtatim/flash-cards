@@ -15,6 +15,19 @@ function isPublicPath(pathname: string) {
   return pathname === "/auth/confirm" || PUBLIC_PATHS.has(pathname);
 }
 
+function clearSupabaseAuthCookies(
+  request: NextRequest,
+  response: NextResponse,
+) {
+  const cookieNames = request.cookies.getAll().map(({ name }) => name);
+
+  cookieNames.forEach((name) => {
+    if (name.startsWith("sb-")) {
+      response.cookies.delete(name);
+    }
+  });
+}
+
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
     request,
@@ -57,10 +70,36 @@ export async function updateSession(request: NextRequest) {
 
   // IMPORTANT: If you remove getClaims() and you use server-side rendering
   // with the Supabase client, your users may be randomly logged out.
-  const { data } = await supabase.auth.getClaims();
-  const user = data?.claims;
   const pathname = request.nextUrl.pathname;
   const isPublicRoute = isPublicPath(pathname);
+
+  let user: Record<string, unknown> | null = null;
+
+  try {
+    const { data } = await supabase.auth.getClaims();
+    user = data?.claims ?? null;
+  } catch (error: unknown) {
+    const isAuthError =
+      typeof error === "object" &&
+      error !== null &&
+      "__isAuthError" in error &&
+      (error as { __isAuthError?: unknown }).__isAuthError === true;
+
+    const authErrorCode =
+      typeof error === "object" &&
+      error !== null &&
+      "code" in error &&
+      typeof (error as { code?: unknown }).code === "string"
+        ? (error as { code: string }).code
+        : null;
+
+    if (isAuthError || authErrorCode === "refresh_token_not_found") {
+      clearSupabaseAuthCookies(request, supabaseResponse);
+      user = null;
+    } else {
+      throw error;
+    }
+  }
 
   if (!user && !isPublicRoute) {
     const url = request.nextUrl.clone();

@@ -1,8 +1,25 @@
 import { updateSession } from "@/lib/supabase/proxy";
-import { type NextRequest } from "next/server";
+import { NextResponse, type NextRequest } from "next/server";
 
 export async function proxy(request: NextRequest) {
-  return await updateSession(request);
+  try {
+    return await updateSession(request);
+  } catch (error: unknown) {
+    // Never block auth pages if session refresh fails in middleware/proxy.
+    if (request.nextUrl.pathname.startsWith("/auth")) {
+      const response = NextResponse.next({ request });
+
+      request.cookies.getAll().forEach(({ name }) => {
+        if (name.startsWith("sb-")) {
+          response.cookies.delete(name);
+        }
+      });
+
+      return response;
+    }
+
+    throw error;
+  }
 }
 
 export const config = {

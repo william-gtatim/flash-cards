@@ -16,6 +16,11 @@ type RegistrarRevisaoInput = {
   grade: ReviewGrade;
 };
 
+type RegistrarRevisaoContext = {
+  cardId: string;
+  previousProgress: ProgressSnapshot | null;
+};
+
 export function useRegistrarRevisaoMutation() {
   const queryClient = useQueryClient();
 
@@ -109,8 +114,38 @@ export function useRegistrarRevisaoMutation() {
         intervalDays: next.intervalDays,
       };
     },
-    onSuccess: async () => {
+    onMutate: async ({ cardId, grade }): Promise<RegistrarRevisaoContext> => {
+      await queryClient.cancelQueries({ queryKey: ["flashcards", "progress", cardId] });
+
+      const previousProgress =
+        queryClient.getQueryData<ProgressSnapshot | null>(["flashcards", "progress", cardId]) ??
+        null;
+      const optimistic = computeSm2Progress(previousProgress, grade, new Date());
+
+      queryClient.setQueryData<ProgressSnapshot>(["flashcards", "progress", cardId], {
+        level: optimistic.level,
+        ease_factor: optimistic.easeFactor,
+        repetition: optimistic.repetition,
+        interval_days: optimistic.intervalDays,
+        lapses: optimistic.lapses,
+        correct_streak: optimistic.correctStreak,
+        review_count: optimistic.reviewCount,
+      });
+
+      return { cardId, previousProgress };
+    },
+    onError: (_error, _variables, context) => {
+      if (!context) return;
+      queryClient.setQueryData(
+        ["flashcards", "progress", context.cardId],
+        context.previousProgress,
+      );
+    },
+    onSettled: async (_data, _error, variables) => {
       await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: ["flashcards", "progress", variables.cardId],
+        }),
         queryClient.invalidateQueries({ queryKey: ["flashcards", "by-ids"] }),
         queryClient.invalidateQueries({ queryKey: ["flashcards", "list"] }),
         queryClient.invalidateQueries({ queryKey: ["flashcards", "due-now"] }),

@@ -2,7 +2,8 @@ import QueryProvider from "@/app/queryProvider";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Suspense } from "react";
 import "./globals.css";
-
+import {Inter} from  'next/font/google';
+const inter = Inter({subsets: ["latin"]})
 export default function ProtectedLayout({
   children,
 }: {
@@ -10,12 +11,11 @@ export default function ProtectedLayout({
 }) {
   return (
       <html lang="pt-BR" suppressHydrationWarning>
-      <body>
+      <body className={inter.className}>
       <ThemeProvider
         attribute="class"
         defaultTheme="system"
         enableSystem
-        disableTransitionOnChange
       >
         <QueryProvider>
             <main className="min-h-screen flex flex-col items-center bg-muted">

@@ -1,33 +1,30 @@
 ﻿import Link from "next/link";
 import Image from "next/image";
-
+import Header from "@/components/header";
 import {ThemeSwitcher} from "@/components/theme-switcher";
 import UserMenu from "@/app/(app)/components/header/userMenu";
 
-export default function Header(){
+export default function HeaderMain(){
     return (
-        <header className="w-full border-b border-b-foreground/10 bg-background  h-16 sticky top-0 ">
-            <nav className="w-full flex justify-center ">
-                <div className="w-full max-w-5xl flex justify-between items-center p-3 px-5 text-sm">
-                    <div className="flex gap-5 items-center font-semibold">
-                        <Link href={"/"} aria-label="Início">
-                            <Image
-                                src="/imagens/logo.svg"
-                                alt="FlashCards"
-                                width={90}
-                                height={40}
-                                className="h-10 w-auto"
-                                priority
-                            />
-                        </Link>
-                    </div>
-                   <div className="flex gap-3 items-center">
-                       <ThemeSwitcher />
-                       <UserMenu />
-                   </div>
-                </div>
-            </nav>
-        </header>
+        <Header>
+            <div className="flex gap-5 items-center ">
+                <Link href={"/"} aria-label="Início" className="flex items-center gap-2">
+                    <Image
+                        src="/imagens/logo-card.svg"
+                        alt="FlashCards"
+                        width={90}
+                        height={40}
+                        className="h-10 w-auto"
+                        priority
+                    />
+                    <span className="font-semibold text-xl leading-none">Flash Code</span>
+                </Link>
+            </div>
+            <div className="flex gap-3 items-center">
+                <ThemeSwitcher />
+                <UserMenu />
+            </div>
+        </Header>
     )
 }
 
