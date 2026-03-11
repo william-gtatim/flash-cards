@@ -15,6 +15,12 @@ import {
 import { createClient } from "@/lib/supabase/client"
 
 export const MAX_FILE_SIZE = 5 * 1024 * 1024 // 5MB
+export const MAX_IMAGE_UPLOAD_SIZE = 100 * 1024 // 100KB
+const MAX_IMAGE_DIMENSION = 1600
+const MIN_IMAGE_DIMENSION = 400
+const INITIAL_WEBP_QUALITY = 0.86
+const MIN_WEBP_QUALITY = 0.55
+const WEBP_QUALITY_STEP = 0.07
 
 export const MAC_SYMBOLS: Record<string, string> = {
   mod: "⌘",
@@ -379,6 +385,8 @@ export const handleImageUpload = async (
     throw new Error("Upload cancelled")
   }
 
+  const optimizedFile = await optimizeImageForUpload(file)
+
   const supabase = createClient()
   const bucket = "imagens"
   const { data: userData, error: userError } = await supabase.auth.getUser()
@@ -393,7 +401,6 @@ export const handleImageUpload = async (
     throw new Error("Usuário não autenticado")
   }
 
-  const extension = file.name.split(".").pop()?.toLowerCase() || "png"
   const safeName = file.name
     .replace(/\.[^/.]+$/, "")
     .toLowerCase()
@@ -404,14 +411,14 @@ export const handleImageUpload = async (
     typeof crypto !== "undefined" && "randomUUID" in crypto
       ? crypto.randomUUID()
       : `${Date.now()}-${Math.floor(Math.random() * 1_000_000)}`
-  const path = `${userId}/${safeName || "image"}-${randomId}.${extension}`
+  const path = `${userId}/${safeName || "image"}-${randomId}.webp`
 
   onProgress?.({ progress: 10 })
 
-  const { error } = await supabase.storage.from(bucket).upload(path, file, {
+  const { error } = await supabase.storage.from(bucket).upload(path, optimizedFile, {
     cacheControl: "31536000",
     upsert: false,
-    contentType: file.type || "image/png",
+    contentType: optimizedFile.type || "image/webp",
   })
 
   if (error) {
@@ -433,6 +440,141 @@ export const handleImageUpload = async (
 
   return publicUrl
 }
+
+const optimizeImageForUpload = async (file: File): Promise<File> => {
+  if (!file.type.startsWith("image/")) {
+    return file
+  }
+
+  const image = await loadImageFromFile(file)
+  let width = image.naturalWidth || image.width
+  let height = image.naturalHeight || image.height
+
+  if (!width || !height) {
+    throw new Error("Nao foi possivel ler as dimensoes da imagem")
+  }
+
+  const longestSide = Math.max(width, height)
+  if (longestSide > MAX_IMAGE_DIMENSION) {
+    const scale = MAX_IMAGE_DIMENSION / longestSide
+    width = Math.max(1, Math.round(width * scale))
+    height = Math.max(1, Math.round(height * scale))
+  }
+
+  const canvas = document.createElement("canvas")
+  const context = canvas.getContext("2d")
+
+  if (!context) {
+    throw new Error("Nao foi possivel inicializar o canvas da imagem")
+  }
+
+  let bestBlob: Blob | null = null
+  let bestWidth = width
+  let bestHeight = height
+
+  while (true) {
+    canvas.width = bestWidth
+    canvas.height = bestHeight
+    context.clearRect(0, 0, bestWidth, bestHeight)
+    context.drawImage(image, 0, 0, bestWidth, bestHeight)
+
+    const compressedBlob = await compressCanvasToWebp(canvas)
+    bestBlob = compressedBlob
+
+    if (compressedBlob.size <= MAX_IMAGE_UPLOAD_SIZE) {
+      break
+    }
+
+    const nextWidth = Math.max(MIN_IMAGE_DIMENSION, Math.round(bestWidth * 0.85))
+    const nextHeight = Math.max(MIN_IMAGE_DIMENSION, Math.round(bestHeight * 0.85))
+
+    if (
+      (nextWidth === bestWidth && nextHeight === bestHeight) ||
+      (bestWidth <= MIN_IMAGE_DIMENSION && bestHeight <= MIN_IMAGE_DIMENSION)
+    ) {
+      break
+    }
+
+    if (bestWidth >= bestHeight) {
+      bestWidth = nextWidth
+      bestHeight = Math.max(1, Math.round((height / width) * bestWidth))
+    } else {
+      bestHeight = nextHeight
+      bestWidth = Math.max(1, Math.round((width / height) * bestHeight))
+    }
+  }
+
+  if (!bestBlob) {
+    throw new Error("Nao foi possivel otimizar a imagem")
+  }
+
+  const fileName = file.name.replace(/\.[^/.]+$/, "") || "image"
+
+  return new File([bestBlob], `${fileName}.webp`, {
+    type: "image/webp",
+    lastModified: Date.now(),
+  })
+}
+
+const loadImageFromFile = async (file: File): Promise<HTMLImageElement> => {
+  const objectUrl = URL.createObjectURL(file)
+
+  try {
+    const image = new Image()
+    image.decoding = "async"
+
+    await new Promise<void>((resolve, reject) => {
+      image.onload = () => resolve()
+      image.onerror = () => reject(new Error("Nao foi possivel carregar a imagem"))
+      image.src = objectUrl
+    })
+
+    return image
+  } finally {
+    URL.revokeObjectURL(objectUrl)
+  }
+}
+
+const compressCanvasToWebp = async (canvas: HTMLCanvasElement): Promise<Blob> => {
+  let quality = INITIAL_WEBP_QUALITY
+  let bestBlob: Blob | null = null
+
+  while (quality >= MIN_WEBP_QUALITY) {
+    const blob = await canvasToBlob(canvas, quality)
+    bestBlob = blob
+
+    if (blob.size <= MAX_IMAGE_UPLOAD_SIZE) {
+      return blob
+    }
+
+    quality -= WEBP_QUALITY_STEP
+  }
+
+  if (!bestBlob) {
+    throw new Error("Nao foi possivel converter a imagem para webp")
+  }
+
+  return bestBlob
+}
+
+const canvasToBlob = (
+  canvas: HTMLCanvasElement,
+  quality: number
+): Promise<Blob> =>
+  new Promise((resolve, reject) => {
+    canvas.toBlob(
+      (blob) => {
+        if (!blob) {
+          reject(new Error("Nao foi possivel gerar o arquivo da imagem"))
+          return
+        }
+
+        resolve(blob)
+      },
+      "image/webp",
+      quality
+    )
+  })
 
 type ProtocolOptions = {
   /**
